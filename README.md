@@ -16,13 +16,13 @@ Leafstore has simple and most useful methods for querying data with advanced and
 ## Installation
 
 ```bash
-npm install leafstore
+npm install leafstore-db
 ```
 
 ## Usage
 
 ```javascript
-import leafstore from "leafstore";
+import leafstore from "leafstore-db";
 const db = new leafstore("databaseName");
 
 // Create a schema for the database
