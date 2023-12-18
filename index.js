@@ -71,7 +71,6 @@ class leafstore {
         // store schemas in the database
         for (let key in this._models) {
           if (this._models.hasOwnProperty(key)) {
-            console.log(this._models[key]._schema._schema);
             schemaStore.add({
               name: key,
               schema: this._models[key]._schema._rawSchema,

@@ -48,7 +48,6 @@ class LeafstoreModel {
           "readwrite"
         );
         const objectStore = transaction.objectStore(this._objectStoreName);
-        console.log(object);
         const request = objectStore.add(object, object[this._schema.key]);
         request.onsuccess = (e) => {
           const key = e.target.result;
