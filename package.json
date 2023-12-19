@@ -1,12 +1,27 @@
 {
   "name": "leafstore-db",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Leafstore is a simple wrapper for the IndexedDB API. It provides a simple interface for storing and retrieving data from IndexedDB. Leafstore is written in JavaScript and is compatible with all modern browsers. It also has js doc comments for all methods and properties.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jindalujjwal0720/leafstore.git"
+  },
+  "keywords": [
+    "indexeddb",
+    "mongoose",
+    "browser",
+    "database",
+    "wrapper",
+    "db",
+    "data",
+    "storage",
+    "store",
+    "object"
+  ],
   "author": "Ujjwal Jindal",
   "license": "MIT"
 }

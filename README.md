@@ -40,6 +40,19 @@ const userSchema = {
 // Create a model
 const User = db.Model("User", userSchema);
 
+// Connect to the database
+try {
+  await db.connect({
+    version: 1,
+    onUpgrade: (event) => {
+      // Do something when the database is upgraded
+    },
+  });
+  console.log("Connected to the database");
+} catch (error) {
+  console.log(error);
+}
+
 // Create a document
 const userObject = {
   name: "John Doe",
@@ -78,73 +91,101 @@ Creates a new database with the given name.
 - `Array` - Array type
 - `Object` - Object type
 
-#### leafstore.prototype.connect(options)
+#### leafstore.connect(options)
 
 - `options` - The options for the database
   - `version` - The version of the database
   - `onUpgrade` - The callback function to be called when the database is upgraded
 
-#### leafstore.prototype.Model(name, schema)
+#### db.Model(name, schema)
 
 - `name` - The name of the model
 - `schema` - The schema of the model
 
 Creates a new model with the given name and schema.
 
-#### leafstore.prototype.Schema(schema)
+#### leafstore.Schema(object)
 
-- `schema` - The schema template of the model
+- `object` - The schema template of the model
 
 Creates a new schema with the given schema.
 
 ### LeafstoreModel
 
-#### LeafstoreModel.prototype.create(object)
+#### LeafstoreModel.create(object)
 
 - `object` - The object to be inserted
 
 Inserts the given object into the collection.
 
-#### LeafstoreModel.prototype.findByKey(key)
+#### LeafstoreModel.insertOne(object)
+
+- `object` - The object to be inserted
+
+Inserts the given object into the collection. If the object already exists, it will update the object.
+
+#### LeafstoreModel.findByKey(key)
 
 - `key` - The key to be searched
 
 Searches the collection for the given key and returns the result.
 
-#### LeafstoreModel.prototype.find(query)
+#### LeafstoreModel.find(query)
 
 - `query` - The query to be executed
 
-Executes the given query and returns the result.
+Executes the given query and returns all the matching results.
 
-#### LeafstoreModel.prototype.findOne(query)
+#### LeafstoreModel.findOne(query)
 
 - `query` - The query to be executed
 
-Executes the given query and returns the first result.
+Executes the given query and returns the first matching result.
 
-#### LeafstoreModel.prototype.findAll()
+#### LeafstoreModel.findByKeyAndUpdate(key, update)
 
-Returns all the documents in the collection.
-
-#### LeafstoreModel.prototype.findByKeyAndUpdate(key, update)
-
-- `key` - The key to be searched
+- `key` - The unique key to be searched
 - `update` - The update to be applied
 
 Searches the collection for the given key and updates the document with the given update.
 
-#### LeafstoreModel.prototype.findByKeyAndDelete(key)
+#### LeafstoreModel.updateOne(query, update)
 
-- `key` - The key to be searched
+- `query` - The query to be executed
+- `update` - The update to be applied
+
+Executes the given query and updates the first matching document with the given update.
+
+#### LeafstoreModel.updateMany(query, update)
+
+- `query` - The query to be executed
+- `update` - The update to be applied
+
+Executes the given query and updates all the matching documents with the given update.
+
+#### LeafstoreModel.findByKeyAndDelete(key)
+
+- `key` - The unique key to be searched
 
 Searches the collection for the given key and deletes the document.
 
-#### LeafstoreModel.prototype.deleteAll()
+#### LeafstoreModel.deleteOne(query)
+
+- `query` - The query to be executed
+
+Executes the given query and deletes the first matching document.
+
+#### LeafstoreModel.deleteMany(query)
+
+- `query` - The query to be executed
+
+Executes the given query and deletes all the matching documents.
+
+#### LeafstoreModel.deleteAll()
 
 Deletes all the documents in the collection. Be careful while using this method.
 
-#### LeafstoreModel.prototype.count(query)
+#### LeafstoreModel.count(query)
 
 - `query` - The query to be executed
 
@@ -172,13 +213,13 @@ Executes the given query and returns the count of the documents matching the que
 - `minLength` - Checks if the length of the value is greater than or equal to the given value
 - `maxLength` - Checks if the length of the value is less than or equal to the given value
 
-#### LeafstoreSchema.prototype.validate(object)
+#### LeafstoreSchema.validate(object)
 
 - `object` - The object to be validated (internal use)
 
 Validates the given object against the schema.
 
-#### LeafstoreSchema.prototype.cast(object)
+#### LeafstoreSchema.cast(object)
 
 - `object` - The object to be casted. (internal use)
 
@@ -186,15 +227,15 @@ Casts the given object against the schema.
 
 ### LeafstoreDocument
 
-#### LeafstoreDocument.prototype.save()
+#### LeafstoreDocument.save()
 
-`Unstable` - Saves the document to the collection. This method is unstable and may not work as expected. Use `LeafstoreModel.prototype.create` instead.
+Saves the document to the collection. If the document already exists, it will update the document.
 
-#### LeafstoreDocument.prototype.toJSON()
+#### LeafstoreDocument.toJSON()
 
 Returns the JSON representation of the document.
 
-#### LeafstoreDocument.prototype.toString()
+#### LeafstoreDocument.toString()
 
 Returns the string representation of the document.
 

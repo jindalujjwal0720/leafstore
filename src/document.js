@@ -1,4 +1,5 @@
-const LeafstoreModel = require("./model");
+// const LeafstoreModel = require("./model");
+import LeafstoreModel from "./model.js";
 
 /**
  * @typedef {Object} LeafstoreDocumentOptions
@@ -23,14 +24,6 @@ class LeafstoreDocument {
     this._object = object;
     this._model = model;
     this._isNew = isNew;
-    this._key = object._key;
-
-    // add fields to document
-    // for (let key in object) {
-    //   if (object.hasOwnProperty(key)) {
-    //     this[key] = object[key];
-    //   }
-    // }
 
     this.#addGettersAndSetters();
   }
@@ -42,9 +35,20 @@ class LeafstoreDocument {
   #addGettersAndSetters() {
     /** @type {Record<keyof T, any>} */
     const schema = this._model._schema._schema;
+    const privateFields = ["_key"];
 
     for (let key in schema) {
       if (this._object.hasOwnProperty(key)) {
+        // add only getters for private fields
+        if (privateFields.includes(key)) {
+          Object.defineProperty(this, key, {
+            get() {
+              return this._object[key];
+            },
+          });
+          continue;
+        }
+        // add getters and setters
         Object.defineProperty(this, key, {
           get() {
             return this._object[key];
@@ -75,8 +79,8 @@ class LeafstoreDocument {
   }
 
   /**
-   * Saves the document to the database
-   * @returns {Promise<LeafstoreDocument>}
+   * Saves the document to the database. If the document is new, it will be created.
+   * @returns {Promise<LeafstoreDocument<T>>}
    */
   async save() {
     if (!this._isNew) {
@@ -84,16 +88,13 @@ class LeafstoreDocument {
     }
     return new Promise((resolve, reject) => {
       try {
-        this._model
-          .findByKeyAndUpdate(this._model._schema.primaryKeyPath, this._object)
-          .then((document) => {
-            this._object = document._object;
-            this._isNew = false;
-            resolve(this);
-          })
-          .catch((error) => {
-            reject(error);
-          });
+        this._model.insertOne(this._object, this._object._key).then((document) => {
+          this._object = document._object;
+          this._isNew = false;
+          resolve(this);
+        }).catch((error) => {
+          reject(error);
+        });
       } catch (error) {
         reject(error);
       }
@@ -101,4 +102,5 @@ class LeafstoreDocument {
   }
 }
 
-module.exports = LeafstoreDocument;
+// module.exports = LeafstoreDocument;
+export default LeafstoreDocument;

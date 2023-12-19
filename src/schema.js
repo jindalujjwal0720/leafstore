@@ -1,7 +1,5 @@
 /**
  * @typedef {Object} LeafstoreSchemaOptions
- * @property {boolean} autoIncrement - Indicates whether the schema should auto increment.
- * @property {string} key - The primary key of the schema.
  */
 
 /**
@@ -10,23 +8,19 @@
  */
 class LeafstoreSchema {
   /**
-   * Creates a Leafstore schema.
+   * Creates a Leafstore schema. This should not be called directly. Use {@link leafstore.Schema} instead.
    * @param {T} object - The template object used to generate the schema.
    * @param {LeafstoreSchemaOptions} options - Optional configuration for the schema.
    * @returns {LeafstoreSchema<T>} A LeafstoreSchema instance.
    */
-  constructor(object, options = { autoIncrement: true, key: null }) {
+  constructor(object, options = {}) {
     this._rawSchema = object;
     this._schema = this.#generateSchema(object);
-    this.autoIncrement = options.autoIncrement;
-    if (options.key && typeof options.key === "string") {
-      this.primaryKeyPath = options.key;
-    }
   }
 
   /**
    * @private
-   * Generates a schema from the template object.
+   * Generates a schema from the given template object.
    * @param {T} object - The template object used to generate the schema.
    * @param {string} name - The name of the object.
    * @returns {Object} The generated schema.
@@ -34,6 +28,15 @@ class LeafstoreSchema {
   #generateSchema(object, name = null) {
     // TODO: check logic again
     let schema = {};
+    // add key to schema if root object
+    if (!name) {
+      schema = {
+        _key: {
+          _type: "string",
+          _validators: [],
+        },
+      };
+    }
     for (let key in object) {
       if (key === "type") {
         const validators = this.#validators(object, name);
@@ -259,4 +262,5 @@ class LeafstoreSchema {
   }
 }
 
-module.exports = LeafstoreSchema;
+// module.exports = LeafstoreSchema;
+export default LeafstoreSchema;
