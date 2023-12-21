@@ -2,12 +2,7 @@
 import LeafstoreModel from "./model.js";
 
 /**
- * @typedef {Object} LeafstoreDocumentOptions
- * @property {boolean} isNew - Indicates whether the document is new.
- */
-
-/**
- * @template T
+ * @template {Record<string, any>} T
  * @class
  */
 class LeafstoreDocument {
@@ -17,8 +12,7 @@ class LeafstoreDocument {
    *
    * @param {T} object
    * @param {LeafstoreModel<T>} model
-   * @param {LeafstoreDocumentOptions} [options]
-   * @returns {LeafstoreDocument<T>}
+   * @param {Boolean} [isNew=true]
    */
   constructor(object, model, isNew = true) {
     this._object = object;
@@ -29,7 +23,6 @@ class LeafstoreDocument {
   }
 
   /**
-   * @private
    * Adds getters and setters to the document
    */
   #addGettersAndSetters() {
@@ -63,7 +56,6 @@ class LeafstoreDocument {
   }
 
   /**
-   * @override
    * @returns {String}
    */
   toString() {
@@ -71,7 +63,6 @@ class LeafstoreDocument {
   }
 
   /**
-   * @override
    * @returns {Object}
    */
   toJSON() {

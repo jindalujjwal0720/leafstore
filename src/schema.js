@@ -3,7 +3,7 @@
  */
 
 /**
- * @template T
+ * @template {Record<string, any>} T
  * @class
  */
 class LeafstoreSchema {
@@ -11,7 +11,6 @@ class LeafstoreSchema {
    * Creates a Leafstore schema. This should not be called directly. Use {@link leafstore.Schema} instead.
    * @param {T} object - The template object used to generate the schema.
    * @param {LeafstoreSchemaOptions} options - Optional configuration for the schema.
-   * @returns {LeafstoreSchema<T>} A LeafstoreSchema instance.
    */
   constructor(object, options = {}) {
     this._rawSchema = object;
@@ -19,13 +18,12 @@ class LeafstoreSchema {
   }
 
   /**
-   * @private
    * Generates a schema from the given template object.
-   * @param {T} object - The template object used to generate the schema.
-   * @param {string} name - The name of the object.
+   * @param {Object} object - The template object used to generate the schema.
+   * @param {string | undefined} [name] - The name of the object.
    * @returns {Object} The generated schema.
    */
-  #generateSchema(object, name = null) {
+  #generateSchema(object, name) {
     // TODO: check logic again
     let schema = {};
     // add key to schema if root object
@@ -67,10 +65,9 @@ class LeafstoreSchema {
   }
 
   /**
-   * @private
    * Generates validators for a field.
    * @param {Object} fieldProps - The properties of the field.
-   * @param {string} name - The name of the field.
+   * @param {string} [name] - The name of the field.
    * @returns {Array<Function>} An array of validators.
    */
   #validators(fieldProps, name) {
@@ -187,7 +184,6 @@ class LeafstoreSchema {
   }
 
   /**
-   * @private
    * Validates an object against the schema.
    * @param {Object} object - The object to validate.
    * @param {Object} schema - The schema to validate against.
@@ -230,7 +226,6 @@ class LeafstoreSchema {
   }
 
   /**
-   * @private
    * Casts an object to the schema.
    * @param {Object} object - The object to cast.
    * @param {Object} schema - The schema to cast against.

@@ -7,14 +7,13 @@ class leafstore {
   /**
    * Creates a leafstore database
    * @param {String} dbName
-   * @returns {leafstore}
    */
   constructor(dbName) {
     if (!dbName) throw new Error("dbName is required");
     if (typeof dbName !== "string") throw new Error("dbName must be a string");
     /** @type {String} */
     this.dbName = dbName;
-    /** @type {IDBDatabase} */
+    /** @type {IDBDatabase | null} */
     this._db = null;
     /** @type {Record<string, LeafstoreModel>} */
     this._models = {};
@@ -23,17 +22,11 @@ class leafstore {
   }
 
   static SchemaTypes = {
-    /** @type {String} */
     String: "string",
-    /** @type {Number} */
     Number: "number",
-    /** @type {Boolean} */
     Boolean: "boolean",
-    /** @type {Date} */
     Date: "date",
-    /** @type {Array} */
     Array: "array",
-    /** @type {Object} */
     Object: "object",
   };
 
@@ -53,7 +46,7 @@ class leafstore {
   async connect(
     options = {
       version: 1,
-      onUpgrade: null,
+      onUpgrade: () => {},
     }
   ) {
     return new Promise((resolve, reject) => {
@@ -62,7 +55,7 @@ class leafstore {
         options.version || this.version
       );
       request.onupgradeneeded = (e) => {
-        this._db = e.target.result;
+        this._db = request.result;
 
         // create object store for schemas
         const schemaStore = this._db.createObjectStore("schemas", {
@@ -92,15 +85,15 @@ class leafstore {
         }
       };
       request.onsuccess = (e) => {
-        this._db = e.target.result;
+        this._db = request.result;
         this.version = this._db.version;
 
         // get schemas from database
         const transaction = this._db.transaction("schemas", "readonly");
         const schemaStore = transaction.objectStore("schemas");
-        const request = schemaStore.getAll();
-        request.onsuccess = (e) => {
-          const schemas = e.target.result;
+        const schemaRequest = schemaStore.getAll();
+        schemaRequest.onsuccess = (e) => {
+          const schemas = schemaRequest.result;
           for (let schema of schemas) {
             this._models[schema.name] = new LeafstoreModel(
               schema.name,
@@ -122,18 +115,20 @@ class leafstore {
         resolve(this);
       };
       request.onerror = (e) => {
-        reject(e.target.error);
+        reject(request.error);
       };
     });
   }
 
   /**
    * Generates an object store for a model
-   * @param {LeafstoreModel<T>} model
+   * @param {LeafstoreModel} model
    * @returns {void}
    */
   #generateObjectStore(model) {
     const { _objectStoreName: objectStoreName, _schema } = model;
+
+    if (!this._db) throw new Error("Database is not connected");
 
     const objectStore = this._db.createObjectStore(objectStoreName, {
       keyPath: "_key",
@@ -188,21 +183,22 @@ class leafstore {
 
   /**
    * creates a leafstore schema
-   * @template T
-   * @param {T} object
+   * @template {Record<string, any>} T
+   * @param {T & { _key: string }} object
    * @param {LeafstoreSchemaOptions} options - optional
    * @returns {LeafstoreSchema<T & { _key: string }>}
    */
   static Schema(object, options = {}) {
-    if (!object) throw new Error("template object is required");
-    if (typeof object !== "object") throw new Error("template object must be of type 'object'");
+    if (!object) throw new Error("schema object is required");
+    if (typeof object !== "object")
+      throw new Error("schema object must be of type 'object'");
 
     return new LeafstoreSchema(object, options);
   }
 
   /**
    * creates a leafstore model
-   * @template T
+   * @template {Record<string, any>} T
    * @param {String} name
    * @param {LeafstoreSchema<T>} schema
    * @returns {LeafstoreModel<T>}
