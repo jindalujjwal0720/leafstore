@@ -1,6 +1,7 @@
 {
   // Change this to match your project
   "include": ["*"],
+  "exclude": ["node_modules"],
   "compilerOptions": {
     // Tells TypeScript to read JS files, as
     // normally they are ignored as source files
@@ -17,6 +18,10 @@
     // go to js file when using IDE functions like
     // "Go to Definition" in VSCode
     "declarationMap": true,
+    // this folder is used for import resolution
+    "baseUrl": ".",
+    // it is a module
+    "module": "commonjs",
     // ... other settings
     "strict": true,
     "alwaysStrict": false,
